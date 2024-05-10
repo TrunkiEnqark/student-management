@@ -1,14 +1,10 @@
 use std::io;
 // use crate::information::Student;
 
-use information::{
-    Student,
-    Birth,
-    MajorState,
-    GenderState
-};
+use information::{Student, Birth};
 mod information;
 
 fn main() {
-    println!("{:?}", Student::enter_gender());
+    let new_stu = Student::new_student();
+    println!("{:?}", new_stu);
 }

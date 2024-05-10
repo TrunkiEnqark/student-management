@@ -33,66 +33,59 @@ pub struct Student {
 impl Birth {
     fn check_day(&self) -> bool {
         let is_leap_year: bool = self.year % 4 == 0 && (self.year % 100 != 0 || self.year % 400 == 0);
-        if self.day == 31 && (self.month == 1 || self.month == 3 || self.month == 5 || self.month == 7 || self.month == 8 || self.month == 10 || self.month == 12) {
+        if (1 <= self.day && self.day <= 31) && (self.month == 1 || self.month == 3 || self.month == 5 || self.month == 7 || self.month == 8 || self.month == 10 || self.month == 12) {
             return true;
         }
-        if self.day == 30 && (self.month == 4 || self.month == 6 || self.month == 9 || self.month == 11) {
+        if (1 <= self.day && self.day <= 30) && (self.month == 4 || self.month == 6 || self.month == 9 || self.month == 11) {
             return true;
         }
         return (is_leap_year && self.day == 29) || (is_leap_year && self.day == 28);
     }
 
     pub fn enter_birthday() -> Birth {
-        let mut temp: String = String::new();
-        let yr = loop {
-            print!("Enter your birth YEAR: ");
-            loop {
-                io::stdin().read_line(&mut temp).expect("Please press your Birth YEAR!");
-                if temp.chars().all(char::is_numeric) {
-                    break;
-                }
-                println!("Wrong input!");
+        let yr: u16 = loop {
+            let mut temp: String = String::new();
+            println!("Enter your birth YEAR: ");
+            io::stdin().read_line(&mut temp).expect("Please press your Birth YEAR!");
+            temp.retain(|c| !c.is_whitespace());
+            if !temp.chars().any(|c| matches!(c, 'a'..= 'z')) {
+                break temp.parse().unwrap();
             }
-            let x: u16 = temp.parse().unwrap();
-            break x;
+            println!("Wrong input!");
         };
 
-        let mon = loop {
-            print!("Enter your birth MONTH: ");
-            loop {
-                io::stdin().read_line(&mut temp).expect("Please press your Birth MONTH!");
-                if temp.chars().all(char::is_numeric) {
-                    let num = temp.parse().unwrap();
-                    if 1 <= num && num <= 12 {
-                        break;
-                    }
-                    break;
+        let mon: u16 = loop {
+            let mut temp: String = String::new();
+            println!("Enter your birth MONTH: ");
+            io::stdin().read_line(&mut temp).expect("Please press your Birth MONTH!");
+            temp.retain(|c| !c.is_whitespace());
+            if !temp.chars().any(|c| matches!(c, 'a'..= 'z')) {
+                let num: u16 = temp.parse().unwrap();
+                if 1 <= num && num <= 12 {
+                    break num;
                 }
-                println!("Wrong input!");
             }
-            let x: u16 = temp.parse().unwrap();
-            break x;
+            println!("Wrong input!");
         };
 
-        let dayy = loop {
-            print!("Enter your birth DAY: ");
-            loop {
-                io::stdin().read_line(&mut temp).expect("Please press your Birth DAY!");
-                if temp.chars().all(char::is_numeric) {
-                    let num = temp.parse().unwrap();
-                    let tmp: Birth = Birth {
-                        year: yr,
-                        month: mon,
-                        day: num
-                    };
+        let dayy: u16 = loop {
+            let mut temp: String = String::new();
+            println!("Enter your birth DAY: ");
+            io::stdin().read_line(&mut temp).expect("Please press your Birth DAY!");
+            temp.retain(|c| !c.is_whitespace());
+            if !temp.chars().any(|x| matches!(x, 'a' ..= 'z')) {
+                let num = temp.parse().unwrap();
+                let tmp: Birth = Birth {
+                    year: yr,
+                    month: mon,
+                    day: num
+                };
 
-                    if tmp.check_day() {
-                        break;
-                    }
+                if tmp.check_day() {
+                    break num;
                 }
-                println!("Wrong input!");
             }
-            break temp.parse().unwrap();
+            println!("Wrong input!");
         };
 
         Birth {
@@ -107,7 +100,7 @@ impl Student {
     pub fn new_student() -> Student {
         // println!("BUG!");
         let enter_name = Student::enter_name();
-        println!("BUG!");
+        // println!("BUG!");
         let enter_birth = Birth::enter_birthday();
         let enter_major = Student::enter_major();
         let enter_gender = Student::enter_gender();
@@ -136,11 +129,12 @@ impl Student {
     // }
 
     pub fn enter_name() -> String {
-        let mut temp = String::new();
         let result = loop {
+            let mut temp = String::new();
             println!("Enter your full name: ");
             io::stdin().read_line(&mut temp).expect("Please press your NAME!");
-            if temp.chars().any(|c| matches!(c, 'a'..='z')) {
+            temp.retain(|c| !c.is_whitespace());
+            if !temp.chars().any(|c| matches!(c, '0'..='9')) {
                 break temp;
             }
         };
@@ -152,11 +146,12 @@ impl Student {
         println!("1. SE");
         println!("2. SS");
         println!("3. SA");
-        print!("Choose your major: ");
-        let mut tmp = String::new();
         let num = loop {
-            io::stdin().read_line(&mut tmp).expect("Input Error");
-            let x: i32 = tmp.parse().unwrap();
+            println!("Choose your major: ");
+            let mut temp = String::new();
+            io::stdin().read_line(&mut temp).expect("Input Error");
+            temp.retain(|c| !c.is_whitespace());
+            let x: i32 = temp.parse().unwrap();
             if x == 1 || x == 2 || x == 3 {
                 break x;
             }
@@ -176,10 +171,11 @@ impl Student {
         println!("1. Male");
         println!("2. Female");
         println!("3. Sexless");
-        print!("Choose your gender: ");
         let mut tmp = String::new();
         let num = loop {
+            println!("Choose your gender: ");
             io::stdin().read_line(&mut tmp).expect("Input Error");
+            tmp.retain(|c| !c.is_whitespace());
             let x: i32 = tmp.parse().unwrap();
             if x == 1 || x == 2 || x == 3 {
                 break x;
@@ -197,17 +193,19 @@ impl Student {
 
     pub fn enter_address() -> String {
         let mut temp = String::new();
-        print!("Press your address: ");
+        println!("Press your address: ");
         io::stdin().read_line(&mut temp).expect("Wrong input!");
+        temp.retain(|c| !c.is_whitespace());
         return temp;
     }
 
     pub fn enter_phone_number() -> String {
-        let mut temp = String::new();
         let result = loop {
-            print!("Press your phone number: ");
-            io::stdin().read_line(&mut temp).expect("Wrong input!");
-            if temp.chars().all(|x| x.is_numeric()) {
+            let mut temp = String::new();
+            println!("Enter your phone number: ");
+            io::stdin().read_line(&mut temp).expect("Please press your NAME!");
+            temp.retain(|c| !c.is_whitespace());
+            if !temp.chars().any(|b| matches!(b, 'a'..='z')) {
                 break temp;
             }
         };
@@ -216,9 +214,10 @@ impl Student {
 
     pub fn enter_email() -> String {
         let mut temp = String::new();
-        print!("Press your Email: ");
+        println!("Press your Email: ");
         io::stdin().read_line(&mut temp).expect("Wrong input!");
-        return temp;
+        temp.retain(|c| !c.is_whitespace());
+        temp
     }
 
     pub fn make_student_id(major: MajorState) -> String {
